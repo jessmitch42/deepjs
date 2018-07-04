@@ -1,9 +1,6 @@
 var App = (function createApp() {
 	const projectTemplate = "<div class='project-entry'><h3 class='project-description' rel='js-project-description'></h3><ul class='work-entries' rel='js-work-entries'></ul><span class='work-time' rel='js-work-time'></span></div>";
 	const workEntryTemplate = "<li class='work-entry'><span class='work-time' rel='js-work-time'></span><span class='work-description' rel='js-work-description'></span></li>";
-	const maxVisibleWorkDescriptionLength = 20;
-	const minWorkDescriptionLength = 5;
-	const maxWorkTime = 600;
 
 	var projects = [];
 
@@ -44,7 +41,7 @@ var App = (function createApp() {
 		var description = $workEntryDescription.val();
 		var minutes = $workEntryTime.val();
 
-		if (!validateWorkEntry(description,minutes)) {
+		if (!Helpers.validateWorkEntry(description,minutes)) {
 			alert("Oops, bad entry. Try again.");
 			$workEntryDescription[0].focus();
 			return;
@@ -56,19 +53,6 @@ var App = (function createApp() {
 		$workEntryDescription[0].focus();
 	}
 
-	function validateWorkEntry(description,minutes) {
-		if (description.length < minWorkDescriptionLength) return false;
-		if (
-			/^\s*$/.test(minutes) ||
-			Number.isNaN(Number(minutes)) ||
-			minutes < 0 ||
-			minutes > maxWorkTime
-		) {
-			return false;
-		}
-
-		return true;
-	}
 
 	function addProject(description) {
 		var projectEntryData;
@@ -137,7 +121,7 @@ var App = (function createApp() {
 		// create a new DOM element for the work entry
 		var $workEntry = $(workEntryTemplate);
 		$workEntry.attr("data-work-entry-id",workEntryData.id);
-		$workEntry.find("[rel*=js-work-time]").text(formatTime(workEntryData.time));
+		$workEntry.find("[rel*=js-work-time]").text(Helpers.formatTime(workEntryData.time));
 		setupWorkDescription(workEntryData,$workEntry.find("[rel*=js-work-description]"));
 
 		workEntryData.$element = $workEntry;
@@ -170,9 +154,9 @@ var App = (function createApp() {
 	}
 
 	function setupWorkDescription(workEntryData,$workDescription) {
-		$workDescription.text(formatWorkDescription(workEntryData.description));
+		$workDescription.text(Helpers.formatWorkDescription(workEntryData.description));
 
-		if (workEntryData.description.length > maxVisibleWorkDescriptionLength) {
+		if (workEntryData.description.length > Helpers.maxVisibleWorkDescriptionLength) {
 			$workDescription
 				.addClass("shortened")
 				.on("click",function onClick(){
@@ -186,34 +170,51 @@ var App = (function createApp() {
 
 	function updateProjectTotalTime(projectEntryData) {
 		var $projectEntry = projectEntryData.$element;
-		$projectEntry.find("> [rel*=js-work-time]").text(formatTime(projectEntryData.time)).show();
+		$projectEntry.find("> [rel*=js-work-time]").text(Helpers.formatTime(projectEntryData.time)).show();
 	}
 
 	function updateWorkLogTotalTime() {
 		if (projects.time > 0) {
-			$totalTime.text(formatTime(projects.time)).show();
+			$totalTime.text(Helpers.formatTime(projects.time)).show();
 		}
 		else {
 			$totalTime.text("").hide();
 		}
 	}
 
-	function formatWorkDescription(description) {
-		if (description.length > maxVisibleWorkDescriptionLength) {
-			description = `${description.substr(0,maxVisibleWorkDescriptionLength)}...`;
+})();
+
+var Helpers = {
+	maxVisibleWorkDescriptionLength = 20,
+	minWorkDescriptionLength = 5,
+	maxWorkTime = 600,
+	validateWorkEntry(description,minutes) {
+		if (description.length < Helpers.minWorkDescriptionLength) return false;
+		if (
+			/^\s*$/.test(minutes) ||
+			Number.isNaN(Number(minutes)) ||
+			minutes < 0 ||
+			minutes > Helpers.maxWorkTime
+		) {
+			return false;
+		}
+
+		return true;
+	},
+	formatWorkDescription(description) {
+		if (description.length > Helpers.maxVisibleWorkDescriptionLength) {
+			description = `${description.substr(0,Helpers.maxVisibleWorkDescriptionLength)}...`;
 		}
 		return description;
-	}
-
-	function formatTime(time) {
+	},
+	formatTime(time) {
 		var hours = Math.floor(time / 60);
 		var minutes = time % 60;
 		if (hours == 0 && minutes == 0) return "";
 		if (minutes < 10) minutes = `0${minutes}`;
 		return `${hours}:${minutes}`;
 	}
-
-})();
+}
 
 App.init();
 
