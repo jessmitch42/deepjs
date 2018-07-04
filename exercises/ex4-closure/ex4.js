@@ -177,10 +177,10 @@ function setupWorkDescription(workEntryData,$workDescription) {
 			$workDescription.text(workEntryData.description);
 			$workDescription.off('click', handleClick);
 
-			// $workDescription
-			// 	.removeClass("shortened");
-			// 	.text(workEntryData.description);
-			// 	.off('click', handleClick);
+			$workDescription
+				.removeClass("shortened");
+				.text(workEntryData.description);
+				.off('click', handleClick);
 		})
 
 		
