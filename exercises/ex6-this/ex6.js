@@ -4,12 +4,12 @@ var Helpers = {
 	maxWorkTime: 600,
 
 	validateWorkEntry(description,minutes) {
-		if (description.length < Helpers.minWorkDescriptionLength) return false;
+		if (description.length < this.minWorkDescriptionLength) return false;
 		if (
 			/^\s*$/.test(minutes) ||
 			Number.isNaN(Number(minutes)) ||
 			minutes < 0 ||
-			minutes > Helpers.maxWorkTime
+			minutes > this.maxWorkTime
 		) {
 			return false;
 		}
@@ -17,8 +17,8 @@ var Helpers = {
 		return true;
 	},
 	formatWorkDescription(description) {
-		if (description.length > Helpers.maxVisibleWorkDescriptionLength) {
-			description = `${description.substr(0,Helpers.maxVisibleWorkDescriptionLength)}...`;
+		if (description.length > this.maxVisibleWorkDescriptionLength) {
+			description = `${description.substr(0,this.maxVisibleWorkDescriptionLength)}...`;
 		}
 		return description;
 	},
@@ -90,7 +90,7 @@ function setupUI() {
 		var description = $workEntryDescription.val();
 		var minutes = $workEntryTime.val();
 
-		if (!Helpers.validateWorkEntry(description,minutes)) {
+		if (!this.validateWorkEntry(description,minutes)) {
 			alert("Oops, bad entry. Try again.");
 			$workEntryDescription[0].focus();
 			return;
@@ -132,7 +132,7 @@ function setupUI() {
 		// create a new DOM element for the work entry
 		var $workEntry = $(workEntryTemplate);
 		$workEntry.attr("data-work-entry-id",workEntryData.id);
-		$workEntry.find("[rel*=js-work-time]").text(Helpers.formatTime(workEntryData.time));
+		$workEntry.find("[rel*=js-work-time]").text(this.formatTime(workEntryData.time));
 		setupWorkDescription(workEntryData,$workEntry.find("[rel*=js-work-description]"));
 
 		workElements[workEntryData.id] = $workEntry;
@@ -158,9 +158,9 @@ function setupUI() {
 	}
 
 	function setupWorkDescription(workEntryData,$workDescription) {
-		$workDescription.text(Helpers.formatWorkDescription(workEntryData.description));
+		$workDescription.text(this.formatWorkDescription(workEntryData.description));
 
-		if (workEntryData.description.length > Helpers.maxVisibleWorkDescriptionLength) {
+		if (workEntryData.description.length > this.maxVisibleWorkDescriptionLength) {
 			$workDescription
 				.addClass("shortened")
 				.on("click",function onClick(){
@@ -177,12 +177,12 @@ function setupUI() {
 		var projectTime = project.getTime();
 
 		var $projectEntry = projectElements[projectId];
-		$projectEntry.find("> [rel*=js-work-time]").text(Helpers.formatTime(projectTime)).show();
+		$projectEntry.find("> [rel*=js-work-time]").text(this.formatTime(projectTime)).show();
 	}
 
 	function updateWorkLogTotalTime(time) {
 		if (time > 0) {
-			$totalTime.text(Helpers.formatTime(time)).show();
+			$totalTime.text(this.formatTime(time)).show();
 		}
 		else {
 			$totalTime.text("").hide();
